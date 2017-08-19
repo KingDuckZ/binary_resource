@@ -15,14 +15,14 @@ function(make_binary_resource)
 
 	if (NOT BINRES_OUTPUT AND NOT BINRES_ARRAY_NAME)
 		get_filename_component(in_basename "${BINRES_INPUT}" NAME_WE)
-		set(BINRES_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${in_basename}.h")
+		set(BINRES_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${in_basename}.c")
 	endif()
 
 	if (BINRES_OUTPUT AND NOT BINRES_ARRAY_NAME)
 		get_filename_component(filename "${BINRES_OUTPUT}" NAME_WE)
 		string(MAKE_C_IDENTIFIER ${filename} BINRES_ARRAY_NAME)
 	elseif(NOT BINRES_OUTPUT AND BINRES_ARRAY_NAME)
-		set(BINRES_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${BINRES_ARRAY_NAME}.h")
+		set(BINRES_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${BINRES_ARRAY_NAME}.c")
 	else()
 		message(FATAL_ERROR "make_binary_resource: Unable to deduce output path and array name")
 	endif()
@@ -34,7 +34,7 @@ function(make_binary_resource)
 		COMMAND $<TARGET_FILE:bin2c>
 			-i "${BINRES_INPUT}"
 			-a ${BINRES_ARRAY_NAME}
-			-l 17
+			-l 15
 			-o ${BINRES_OUTPUT}
 			DEPENDS bin2c ${BINRES_INPUT}
 		COMMENT "Making binary resource for ${BINRES_ARRAY_NAME}"
