@@ -29,15 +29,28 @@ function(make_binary_resource)
 
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${BINRES_OUTPUT}")
 
-	add_custom_command(
-		OUTPUT "${BINRES_OUTPUT}"
-		COMMAND $<TARGET_FILE:bin2c>
-			-i "${BINRES_INPUT}"
-			-a ${BINRES_ARRAY_NAME}
-			-l 15
-			-o ${BINRES_OUTPUT}
+	if (BINRES_GZIP)
+		add_custom_command(
+			OUTPUT "${BINRES_OUTPUT}"
+			COMMAND gzip "${BINRES_INPUT}" --stdout | $<TARGET_FILE:bin2c>
+				-a ${BINRES_ARRAY_NAME}
+				-l 15
+				-o ${BINRES_OUTPUT}
 			DEPENDS bin2c ${BINRES_INPUT}
-		COMMENT "Making binary resource for ${BINRES_ARRAY_NAME}"
-		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-	)
+			COMMENT "Making gzipped binary resource for ${BINRES_ARRAY_NAME}"
+			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+		)
+	else()
+		add_custom_command(
+			OUTPUT "${BINRES_OUTPUT}"
+			COMMAND $<TARGET_FILE:bin2c>
+				-i "${BINRES_INPUT}"
+				-a ${BINRES_ARRAY_NAME}
+				-l 15
+				-o ${BINRES_OUTPUT}
+			DEPENDS bin2c ${BINRES_INPUT}
+			COMMENT "Making binary resource for ${BINRES_ARRAY_NAME}"
+			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+		)
+	endif()
 endfunction()
