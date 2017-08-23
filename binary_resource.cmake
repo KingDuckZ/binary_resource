@@ -4,10 +4,13 @@ endif()
 
 function(make_binary_resource)
 	set(opts GZIP)
-	set(val_args INPUT ARRAY_NAME OUTPUT)
+	set(val_args INPUT ARRAY_NAME OUTPUT EXTENSION)
 	set(mval_args "")
 	cmake_parse_arguments(BINRES "${opts}" "${val_args}" "${mval_args}" ${ARGN})
 
+	if (NOT BINRES_EXTENSION)
+		set(BINRES_EXTENSION ".c")
+	endif()
 
 	if (NOT BINRES_INPUT)
 		message(FATAL_ERROR "make_binary_resource: no input specified")
@@ -15,15 +18,15 @@ function(make_binary_resource)
 
 	if (NOT BINRES_OUTPUT AND NOT BINRES_ARRAY_NAME)
 		get_filename_component(in_basename "${BINRES_INPUT}" NAME_WE)
-		set(BINRES_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${in_basename}.c")
+		set(BINRES_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${in_basename}${BINRES_EXTENSION}")
 	endif()
 
 	if (BINRES_OUTPUT AND NOT BINRES_ARRAY_NAME)
 		get_filename_component(filename "${BINRES_OUTPUT}" NAME_WE)
 		string(MAKE_C_IDENTIFIER ${filename} BINRES_ARRAY_NAME)
 	elseif(NOT BINRES_OUTPUT AND BINRES_ARRAY_NAME)
-		set(BINRES_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${BINRES_ARRAY_NAME}.c")
-	else()
+		set(BINRES_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${BINRES_ARRAY_NAME}${BINRES_EXTENSION}")
+	elseif(NOT BINRES_OUTPUT AND NOT BINRES_ARRAY_NAME)
 		message(FATAL_ERROR "make_binary_resource: Unable to deduce output path and array name")
 	endif()
 
@@ -38,7 +41,7 @@ function(make_binary_resource)
 				-o ${BINRES_OUTPUT}
 			DEPENDS bin2c ${BINRES_INPUT}
 			COMMENT "Making gzipped binary resource for ${BINRES_ARRAY_NAME}"
-			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+			WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		)
 	else()
 		add_custom_command(
@@ -50,7 +53,7 @@ function(make_binary_resource)
 				-o ${BINRES_OUTPUT}
 			DEPENDS bin2c ${BINRES_INPUT}
 			COMMENT "Making binary resource for ${BINRES_ARRAY_NAME}"
-			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+			WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		)
 	endif()
 endfunction()
