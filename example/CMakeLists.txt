@@ -5,7 +5,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 include(binary_resource)
 make_binary_resource(
-	INPUT main.cpp
+	INPUT ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 	ARRAY_NAME main_src
 )
 

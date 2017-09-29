@@ -5,7 +5,7 @@ endif()
 function(make_binary_resource)
 	set(opts GZIP)
 	set(val_args INPUT ARRAY_NAME OUTPUT EXTENSION)
-	set(mval_args "")
+	set(mval_args PREFIX)
 	cmake_parse_arguments(BINRES "${opts}" "${val_args}" "${mval_args}" ${ARGN})
 
 	if (NOT BINRES_EXTENSION)
@@ -32,6 +32,12 @@ function(make_binary_resource)
 
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${BINRES_OUTPUT}")
 
+	if (BINRES_PREFIX)
+		set(prefix_option -p "\"${BINRES_PREFIX}\"")
+	else()
+		set(prefix_option "")
+	endif()
+
 	if (BINRES_GZIP)
 		add_custom_command(
 			OUTPUT "${BINRES_OUTPUT}"
@@ -39,6 +45,7 @@ function(make_binary_resource)
 				-a ${BINRES_ARRAY_NAME}
 				-l 15
 				-o ${BINRES_OUTPUT}
+				${prefix_option}
 			DEPENDS bin2c ${BINRES_INPUT}
 			COMMENT "Making gzipped binary resource for ${BINRES_ARRAY_NAME}"
 			WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
@@ -51,6 +58,7 @@ function(make_binary_resource)
 				-a ${BINRES_ARRAY_NAME}
 				-l 15
 				-o ${BINRES_OUTPUT}
+				${prefix_option}
 			DEPENDS bin2c ${BINRES_INPUT}
 			COMMENT "Making binary resource for ${BINRES_ARRAY_NAME}"
 			WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
